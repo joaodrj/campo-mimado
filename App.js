@@ -1,14 +1,41 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Platform } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import params from './src/params';
+import MineFields from './src/components/MineFields';
+import { createMinesBoard } from './src/functions';
 
 export default class App extends Component {
+
+  constructor(props){
+    super(props)
+    this.state = this.createState()
+  }
+
+  minesAmount = () => {
+    const cols = params.getColumnsAmount()
+    const rows = params.getRowsAmount()
+    return Math.ceil(cols * rows * params.difficultLevel)
+  }
+
+  createState = () => {
+    const cols = params.getColumnsAmount()
+    const rows = params.getRowsAmount()
+    return {
+      board: createMinesBoard(rows, cols, this.minesAmount()),
+    }
+  }
+
+
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>Iniciando o Mines!</Text>
         <Text style={styles.instructions}>Tamanho da grade: 
           {params.getRowsAmount()}x{params.getColumnsAmount()}</Text>
+        <View style={styles.board}>
+          <MineFields board={this.state.board}/>
+        </View>
+
       </View>
     );
   }
@@ -17,17 +44,11 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+  },
+  board: {
     alignItems: 'center',
-    backgroundColor: '#F5FCFF', // Corrigido o código da cor
+    backgroundColor: '#AAA'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+
 });
