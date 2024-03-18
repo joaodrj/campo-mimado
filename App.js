@@ -1,8 +1,20 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Alert, } from 'react-native';
 import params from './src/params';
 import MineFields from './src/components/MineFields';
-import { createMinesBoard } from './src/functions';
+import Header from './src/components/Header';
+import LeveSelection from './src/screens/LeveSelection';
+import { 
+  createMinesBoard,
+  cloneBoard,
+  openField,
+  hadExplosion,
+  wonGame,
+  showMines,
+  invertFlag,
+  flagsUsed
+} from './src/functions';
+
 
 export default class App extends Component {
 
@@ -22,18 +34,59 @@ export default class App extends Component {
     const rows = params.getRowsAmount()
     return {
       board: createMinesBoard(rows, cols, this.minesAmount()),
+      won: false,
+      lost: false,
+      showLevelSelection: false,
     }
+  }
+
+  onOpenField = (row, column) => {
+    const board = cloneBoard(this.state.board)
+    openField(board, row, column)
+    const lost = hadExplosion(board)
+    const won = wonGame(board)
+
+    if (lost) {
+      showMines(board)
+      Alert.alert('Perdeeeeu', 'Que buuuuro!')
+    }
+
+    if (won) {
+      Alert.alert('Parabéns', 'Você Venceu!')
+    }
+    this.setState({board, lost, won})
+  }
+
+  onSelectField = (row, column) => {
+    const board = cloneBoard(this.state.board)
+    invertFlag(board, row, column)
+    const won = wonGame(board)
+
+    if (won) {
+      Alert.alert('Parabéns', 'Você Venceu!')
+    }
+    this.setState({board, won})
+  }
+
+  onLevelSelected = level => {
+    params.difficultLevel = level
+    this.setState(this.createState())
   }
 
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Iniciando o Mines!</Text>
-        <Text style={styles.instructions}>Tamanho da grade: 
-          {params.getRowsAmount()}x{params.getColumnsAmount()}</Text>
+        <LeveSelection isVisible={this.state.showLevelSelection}
+          onLevelSelected={this.onLevelSelected}
+          onCancel={() => this.setState({ showLevelSelection: false})} />
+        <Header flagsLeft={this.minesAmount() - flagsUsed(this.state.board)}
+          onNewGame={() => this.setState(this.createState())} 
+          onFlagPress={() => this.setState({showLevelSelection:true})}/>
         <View style={styles.board}>
-          <MineFields board={this.state.board}/>
+          <MineFields board={this.state.board}
+            onOpenField={this.onOpenField}
+            onSelectField={this.onSelectField} />
         </View>
 
       </View>
@@ -48,7 +101,7 @@ const styles = StyleSheet.create({
   },
   board: {
     alignItems: 'center',
-    backgroundColor: '#AAA'
+    backgroundColor: '#DDD'
   },
 
 });
