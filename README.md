@@ -1,4 +1,7 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+<p align="center">
+  <img src="https://github.com/joaodrj/campo-mimado/blob/main/Captura%20de%20tela%202024-03-18%20175313.png" alt="jogo campo mimado" title="Tela do jogo"/>
+</p>
 
 # Getting Started
 
